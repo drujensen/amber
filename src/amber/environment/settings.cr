@@ -135,36 +135,4 @@ module Amber::Environment
       @logger
     end
   end
-
-  class Logging
-    SEVERITY_MAP = {
-      "debug":   Logger::DEBUG,
-      "info":    Logger::INFO,
-      "warn":    Logger::WARN,
-      "error":   Logger::ERROR,
-      "fatal":   Logger::FATAL,
-      "unknown": Logger::UNKNOWN,
-    }
-    property color : Bool
-    property time : Bool
-    property level : Bool
-    property log_level : String
-    property context : Array(String)
-    property skip : Array(String)
-    property filter : Array(String)
-
-    def initialize(logging : Settings::LoggingType)
-      @color = logging[:color]
-      @time = logging[:time]
-      @level = logging[:level]
-      @log_level = logging[:severity]
-      @filter = logging[:filter]
-      @skip = logging[:skip]
-      @context = logging[:context]
-    end
-
-    def severity
-      SEVERITY_MAP[log_level]
-    end
-  end
 end

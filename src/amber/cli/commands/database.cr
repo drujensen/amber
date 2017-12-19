@@ -4,14 +4,19 @@ require "mysql"
 require "sqlite3"
 
 module Amber::CLI
+  CLI.logger.progname = "Database"
+  Micrate.logger = settings.logger
+  Micrate.logger.progname = "Database"
+
   class MainCommand < ::Cli::Supercommand
     command "db", aliased: "database"
 
-    class Database < ::Cli::Command
+    class Database < Command
       command_name "database"
 
       class Options
         arg_array "commands", desc: "drop create migrate rollback redo status version seed"
+        bool "--no-color", desc: "# Disable colored output", default: false
         help
       end
 
@@ -20,8 +25,8 @@ module Amber::CLI
       end
 
       def run
+        CLI.toggle_colors(options.no_color?)
         args.commands.each do |command|
-          Micrate::Cli.setup_logger
           Micrate::DB.connection_url = database_url
           case command
           when "drop"
@@ -48,7 +53,7 @@ module Amber::CLI
       rescue e : Micrate::UnorderedMigrationsException
         exit! Micrate::Cli.report_unordered_migrations(e.versions), error: true
       rescue e : DB::ConnectionRefused
-        exit! "Connection refused: #{Micrate::DB.connection_url}", error: true
+        exit! "Connection refused: #{Micrate::DB.connection_url.colorize(:light_blue)}", error: true
       rescue e : Exception
         exit! e.message, error: true
       end
@@ -87,14 +92,12 @@ module Amber::CLI
           Micrate::DB.connection_url = url.gsub(path, "/#{uri.scheme}")
           return path.gsub("/", "")
         else
-          raise "Could not determine database name"
+          CLI.logger.puts "Could not determine database name", "Error", :red
         end
       end
 
       private def database_url
-        ENV["DATABASE_URL"]? || begin
-          CLI.settings.database_url
-        end
+        ENV["DATABASE_URL"]? || CLI.settings.database_url
       end
     end
   end
