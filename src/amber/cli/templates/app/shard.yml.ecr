@@ -17,9 +17,8 @@ targets:
 
 dependencies:
   amber:
-    github: amberframework/amber
-    branch: master
-    #version: <%= Amber::VERSION %>
+    github: bcardiff/amber
+    branch: use-bcardiff-fork
 
   granite:
     github: amberframework/granite
@@ -44,7 +43,7 @@ dependencies:
 <% when "sqlite" -%>
   sqlite3:
     github: crystal-lang/crystal-sqlite3
-    version: ~> 0.11.0
+    branch: crystal/0.29.0
 <% end -%>
 
   citrine-i18n:
